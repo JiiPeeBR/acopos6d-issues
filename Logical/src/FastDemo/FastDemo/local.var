@@ -1,0 +1,29 @@
+VAR
+	task : REFERENCE TO FastDemoType;
+	local : FastDemoLocalType;
+	fb : FastDemoFbType;
+	hmi : FastDemoHmiType;
+	actions_state : FastDemoActionsStateType;
+	actions_substate : FastDemoActionsSubstateType;
+END_VAR
+(* ----- PackML ----- *)
+VAR
+	em : EquipmentModule;
+END_VAR
+(*----- Stations ----*)
+VAR
+	station_num : {REDUND_UNREPLICABLE} DINT := 0;
+	str : STRING[80];
+	i : DINT;
+END_VAR
+VAR CONSTANT
+	STATION_COUNT : DINT := 7;
+END_VAR
+VAR
+	stations : ARRAY[0..STATION_COUNT] OF fdStation;
+	station : REFERENCE TO fdStation;
+END_VAR
+(*Issue 1*)
+VAR
+	issue1 : Issue1Type;
+END_VAR

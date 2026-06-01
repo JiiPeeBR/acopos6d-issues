@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?AutomationStudio FileVersion="4.9"?>
+<Library SubType="IEC" xmlns="http://br-automation.co.at/AS/Library">
+  <Files>
+    <File Description="Exported data types">Types.typ</File>
+    <File Description="Exported constants">Constants.var</File>
+    <File Description="Exported functions and function blocks">FastLib.fun</File>
+    <File>fdStationQueueControl.st</File>
+    <File>fdTiltAround.st</File>
+    <File>fdWaitUntilIdle.st</File>
+    <File>fdPulse.st</File>
+    <File>fdFindZone.st</File>
+    <File>fdMove6DSync.st</File>
+    <File>fdStation.st</File>
+  </Files>
+</Library>
