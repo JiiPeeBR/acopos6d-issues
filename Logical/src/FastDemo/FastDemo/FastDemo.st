@@ -50,7 +50,64 @@ PROGRAM _CYCLIC
 	
 	// Issue 2: Wait for command label command does not work correctly
 	// =================================================================================================================
+	CASE issue2.state OF
+		1:
+			// Set so that shuttle ID 1 waits for shuttle ID 2 to start its movement with label 255
+			issue2.WaitCommandLabel.Execute := TRUE;
+			issue2.WaitCommandLabel.Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue2.WaitCommandLabel.TriggerXID := gShuttles.Shuttle[1].ID; // Wait for Xbot ID 2
+			issue2.WaitCommandLabel.TriggerCmdLb := 255; // Wait for command label number 255
+			IF issue2.WaitCommandLabel.Acknowledge THEN
+				issue2.WaitCommandLabel.Execute := FALSE;
+	  			issue2.state := 10;
+			END_IF;
+		
+		2:
+			// Set so that shuttle ID 1 waits for shuttle ID 2 to start its movement with label 255
+			issue2.WaitCommandLabel.Execute := TRUE;
+			issue2.WaitCommandLabel.Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue2.WaitCommandLabel.TriggerXID := gShuttles.Shuttle[1].ID; // Wait for Xbot ID 2
+			issue2.WaitCommandLabel.TriggerCmdLb := 256; // Wait for command label number 256
+			IF issue2.WaitCommandLabel.Acknowledge THEN
+				issue2.WaitCommandLabel.Execute := FALSE;
+				issue2.state := 10;
+			END_IF;
+		
+		10:
+			// Queue move command for the shuttler ID 1
+			issue2.MoveInPlane.Execute := TRUE;
+			issue2.MoveInPlane.Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			IF issue2.MoveInPlane.Acknowledge THEN
+				issue2.MoveInPlane.Execute := FALSE;
+				issue2.state := 11;
+			END_IF;
+		
+		11:
+			// Issue move command for the shuttler ID 2 with command label that matches the wait command
+			issue2.MoveInPlane.Execute := TRUE;
+			issue2.MoveInPlane.CommandLabel := issue2.WaitCommandLabel.TriggerCmdLb;
+			issue2.MoveInPlane.Shuttle := ADR(gShuttles.Shuttle[1].Ref);
+			IF issue2.MoveInPlane.Acknowledge THEN
+				issue2.MoveInPlane.Execute := FALSE;
+				issue2.state := 12;
+			END_IF;
+		ELSE
+			issue2.MoveInPlane.Execute := FALSE;
+			issue2.WaitCommandLabel.Execute := FALSE;
+	END_CASE;
 	
+	issue2.MoveInPlane.Parameters.Acceleration := 10;
+	issue2.MoveInPlane.Parameters.Velocity := 0.1;
+	issue2.MoveInPlane.Parameters.Mode := 1; // Relative
+	issue2.MoveInPlane.Parameters.Path := 0; // Direct
+	issue2.MoveInPlane.Parameters.Position.X := 0;
+	issue2.MoveInPlane.Parameters.Position.Y := -0.360;
+	issue2.MoveInPlane();
+			
+	issue2.WaitCommandLabel.LabelType := 0;
+	issue2.WaitCommandLabel.TriggerType := 0;
+	issue2.WaitCommandLabel();
+			
 	// Issue 3: Move Async error after group rotate stop
 	// =================================================================================================================	
 	

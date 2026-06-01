@@ -37,4 +37,9 @@ TYPE
 	Issue1Type : 	STRUCT 
 		state : USINT;
 	END_STRUCT;
+	Issue2Type : 	STRUCT 
+		state : USINT;
+		MoveInPlane : MC_BR_MoveInPlane_Acp6D;
+		WaitCommandLabel : MC_BR_ShWaitCmdLb_Acp6D;
+	END_STRUCT;
 END_TYPE

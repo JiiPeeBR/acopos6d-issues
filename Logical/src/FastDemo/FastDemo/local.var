@@ -26,4 +26,5 @@ END_VAR
 (*Issue 1*)
 VAR
 	issue1 : Issue1Type;
+	issue2 : Issue2Type;
 END_VAR
