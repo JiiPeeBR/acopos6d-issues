@@ -27,4 +27,5 @@ END_VAR
 VAR
 	issue1 : Issue1Type;
 	issue2 : Issue2Type;
+	issue3 : Issue3Type;
 END_VAR

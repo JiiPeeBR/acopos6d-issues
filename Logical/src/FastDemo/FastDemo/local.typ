@@ -42,4 +42,17 @@ TYPE
 		MoveInPlane : MC_BR_MoveInPlane_Acp6D;
 		WaitCommandLabel : MC_BR_ShWaitCmdLb_Acp6D;
 	END_STRUCT;
+	Issue3Type : 	STRUCT 
+		state : USINT;
+		DoNotRotateBack : BOOL;
+		MoveInPlaneAsync : MC_BR_MoveInPlaneAsync_Acp6D;
+		MoveInPlane : MC_BR_MoveInPlane_Acp6D;
+		GroupCreate : MC_BR_ShGroupCreate_Acp6D;
+		GroupDelete : MC_BR_ShGroupDelete_Acp6D;
+		GroupAddShuttle : MC_BR_ShGroupAddShuttle_Acp6D;
+		GroupCoupleCtrl : MC_BR_ShGroupCoupleCtrl_Acp6D;
+		MoveStop : MC_BR_AsmStop_Acp6D;
+		MoveShortAxis : MC_BR_MoveShortAxis_Acp6D;
+		ShuttleGroup : Mc6DShuttleGroupType;
+	END_STRUCT;
 END_TYPE

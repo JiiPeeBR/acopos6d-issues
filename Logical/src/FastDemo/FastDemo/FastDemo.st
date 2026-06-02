@@ -110,6 +110,157 @@ PROGRAM _CYCLIC
 			
 	// Issue 3: Move Async error after group rotate stop
 	// =================================================================================================================	
+	CASE issue3.state OF
+		1:
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[0].Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[0].X := 0.420;
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[0].Y := 0.180;
+	
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[1].Shuttle := ADR(gShuttles.Shuttle[1].Ref);
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[1].X := 0.540;
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[1].Y := 0.180;
+			
+			issue3.MoveInPlaneAsync.Execute := TRUE;
+			IF issue3.MoveInPlaneAsync.Done THEN
+				issue3.MoveInPlaneAsync.Execute := FALSE;
+	  			issue3.state := 2;
+			END_IF;
+		2:
+			issue3.GroupCreate.Execute := TRUE;
+			IF issue3.GroupCreate.Done THEN
+				issue3.GroupCreate.Execute := FALSE;
+				issue3.ShuttleGroup := issue3.GroupCreate.ShuttleGroup;
+				issue3.state := 3;
+			END_IF;
+		3:
+			issue3.GroupAddShuttle.Parameters.ShuttleList[0].Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue3.GroupAddShuttle.Parameters.ShuttleList[1].Shuttle := ADR(gShuttles.Shuttle[1].Ref);
+			issue3.GroupAddShuttle.Execute := TRUE;
+			IF issue3.GroupAddShuttle.Done THEN
+				issue3.GroupAddShuttle.Execute := FALSE;
+	  			issue3.state := 4;
+			END_IF;
+		4:
+			issue3.GroupCoupleCtrl.Parameters.Mode :=  1; // Common rot ref
+			issue3.GroupCoupleCtrl.Parameters.Option :=  1; // Couple
+			issue3.GroupCoupleCtrl.Execute := TRUE;
+			IF issue3.GroupCoupleCtrl.Done THEN
+				issue3.GroupCoupleCtrl.Execute := FALSE;
+				issue3.state := 10;
+			END_IF;
+		10:
+			issue3.MoveShortAxis.Parameters.Mode := 1; // Relative
+			issue3.MoveShortAxis.Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue3.MoveShortAxis.Parameters.Position.Z := 0;
+			issue3.MoveShortAxis.Parameters.Position.Rx := 0;
+			issue3.MoveShortAxis.Parameters.Position.Ry := 0;
+			issue3.MoveShortAxis.Parameters.Position.Rz := 0.15;
+			issue3.MoveShortAxis.Execute := TRUE;
+			IF issue3.MoveShortAxis.Done THEN
+				issue3.MoveShortAxis.Execute := FALSE;
+	  			issue3.state := 11;
+			END_IF;	
+		11:
+			IF issue3.DoNotRotateBack THEN
+				// CASE: Do not rotate back
+				issue3.state := 20;
+			ELSE
+				// CASE: Rotate back
+				issue3.MoveShortAxis.Parameters.Mode := 1; // Relative
+				issue3.MoveShortAxis.Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+				issue3.MoveShortAxis.Parameters.Position.Z := 0;
+				issue3.MoveShortAxis.Parameters.Position.Rx := 0;
+				issue3.MoveShortAxis.Parameters.Position.Ry := 0;
+				issue3.MoveShortAxis.Parameters.Position.Rz := -0.15;
+				issue3.MoveShortAxis.Execute := TRUE;
+				IF issue3.MoveShortAxis.Done THEN
+					issue3.MoveShortAxis.Execute := FALSE;
+					issue3.state := 20;
+				END_IF;	
+			END_IF;
+		20:
+			issue3.MoveStop.Execute := TRUE;
+			IF issue3.MoveStop.Done THEN
+				issue3.MoveStop.Execute := FALSE;
+				issue3.state := 21;
+			END_IF
+		21:
+			issue3.GroupDelete.Execute := TRUE;
+			IF issue3.GroupDelete.Done THEN
+				issue3.GroupDelete.Execute := FALSE;
+				issue3.state := 22;
+			END_IF
+		22:
+			issue3.MoveShortAxis.Parameters.Mode := 0; // Absolute
+			issue3.MoveShortAxis.Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue3.MoveShortAxis.Parameters.Position.Z := 0.001;
+			issue3.MoveShortAxis.Parameters.Position.Rx := 0;
+			issue3.MoveShortAxis.Parameters.Position.Ry := 0;
+			issue3.MoveShortAxis.Parameters.Position.Rz := 0;
+			issue3.MoveShortAxis.Execute := TRUE;
+			IF issue3.MoveShortAxis.Acknowledge THEN
+				issue3.MoveShortAxis.Execute := FALSE;
+				issue3.state := 23;
+			END_IF;	
+		23:
+			issue3.MoveShortAxis.Parameters.Mode := 0; // Absolute
+			issue3.MoveShortAxis.Shuttle := ADR(gShuttles.Shuttle[1].Ref);
+			issue3.MoveShortAxis.Parameters.Position.Z := 0.001;
+			issue3.MoveShortAxis.Parameters.Position.Rx := 0;
+			issue3.MoveShortAxis.Parameters.Position.Ry := 0;
+			issue3.MoveShortAxis.Parameters.Position.Rz := 0;
+			issue3.MoveShortAxis.Execute := TRUE;
+			IF issue3.MoveShortAxis.Done THEN
+				issue3.MoveShortAxis.Execute := FALSE;
+				issue3.state := 30;
+			END_IF;	
+			
+			
+		30:
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[0].Shuttle := ADR(gShuttles.Shuttle[0].Ref);
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[0].X := 0.420;
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[0].Y := 0.540;
+	
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[1].Shuttle := ADR(gShuttles.Shuttle[1].Ref);
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[1].X := 0.540;
+			issue3.MoveInPlaneAsync.Parameters.AsyncPar[1].Y := 0.540;
+			
+			issue3.MoveInPlaneAsync.Execute := TRUE;
+			IF issue3.MoveInPlaneAsync.Done THEN
+				issue3.MoveInPlaneAsync.Execute := FALSE;
+				issue3.state := 100;
+			END_IF;  
+	END_CASE
+		
+	issue3.GroupCreate.Assembly := ADR(gAssembly6D_Big);
+	issue3.GroupCreate();
+	
+	issue3.GroupAddShuttle.ShuttleGroup := ADR(issue3.ShuttleGroup);
+	issue3.GroupAddShuttle();
+	
+	issue3.GroupCoupleCtrl.ShuttleGroup := ADR(issue3.ShuttleGroup);
+	issue3.GroupCoupleCtrl();
+	
+	issue3.GroupDelete.ShuttleGroup := ADR(issue3.ShuttleGroup);
+	issue3.GroupDelete();
+	
+	issue3.MoveInPlaneAsync.Assembly := ADR(gAssembly6D_Big);
+	issue3.MoveInPlaneAsync.Parameters.Acceleration := 10;
+	issue3.MoveInPlaneAsync.Parameters.Velocity := 1;
+	issue3.MoveInPlaneAsync.Parameters.MoveOnlySelectedShuttles := TRUE;
+	issue3.MoveInPlaneAsync();
+	
+	
+	issue3.MoveShortAxis.Parameters.Velocity.Z := 0.1;
+	issue3.MoveShortAxis.Parameters.Velocity.Rx := 0.1;
+	issue3.MoveShortAxis.Parameters.Velocity.Ry := 0.1;
+	issue3.MoveShortAxis.Parameters.Velocity.Rz := 0.1;
+	issue3.MoveShortAxis.Parameters.Rotation.Center.X := 0.240;
+	issue3.MoveShortAxis.Parameters.Rotation.Center.Y := 0.180;
+	issue3.MoveShortAxis();
+	
+	issue3.MoveStop.Assembly := ADR(gAssembly6D_Big);
+	issue3.MoveStop();
 	
 	
 	// Task state machine
